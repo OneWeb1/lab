@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="uk">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Додаток для замовлення їжі</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				margin: 0;
+				padding: 20px;
+				background-color: #f4f4f4; /* Світло-сірий фон */
+			}
+			.container {
+				max-width: 600px;
+				margin: auto;
+				background-color: #fff;
+				padding: 20px;
+				border-radius: 10px;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тінь */
+			}
+			h1 {
+				text-align: center;
+				color: #e44d26; /* Оранжевий колір */
+			}
+			label {
+				display: block;
+				margin: 10px 0 5px;
+				font-weight: bold;
+			}
+			input,
+			select,
+			textarea {
+				width: 100%;
+				padding: 10px;
+				margin-bottom: 15px;
+				border-radius: 5px;
+				border: 1px solid #ddd; /* Світло-сіра рамка */
+			}
+			button {
+				padding: 10px 15px;
+				background-color: #e44d26; /* Оранжевий колір */
+				color: white;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				transition: background-color 0.3s ease; /* Плавний перехід кольору */
+			}
+			button:hover {
+				background-color: #cc4422; /* Темніший оранжевий при наведенні */
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Замовлення їжі</h1>
+			<form id="orderForm">
+				<label for="name">Ваше ім'я:</label>
+				<input type="text" id="name" required />
+				<label for="address">Адреса доставки:</label>
+				<input type="text" id="address" required />
+				<label for="food">Оберіть страву:</label>
+				<select id="food">
+					<option value="Піца">Піца</option>
+					<option value="Суші">Суші</option>
+					<option value="Бургер">Бургер</option>
+					<option value="Паста">Паста</option>
+				</select>
+				<label for="comments">Коментар до замовлення:</label>
+				<textarea id="comments" rows="4"></textarea>
+				<button type="submit">Замовити</button>
+			</form>
+			<div id="confirmation" style="display: none">
+				<h2>Дякуємо за замовлення!</h2>
+				<p id="orderDetails"></p>
+			</div>
+		</div>
+		<script>
+			document
+				.getElementById('orderForm')
+				.addEventListener('submit', function (e) {
+					e.preventDefault();
+					// Отримуємо значення полів
+					var name = document.getElementById('name').value;
+					var address = document.getElementById('address').value;
+					var food = document.getElementById('food').value;
+					var comments = document.getElementById('comments').value;
+					// Формуємо підтвердження замовлення
+					var orderDetails = `
+Ім'я: ${name}<br>
+Адреса: ${address}<br>
+Страва: ${food}<br>
+Коментар: ${comments ? comments : 'Немає коментарів'}
+`;
+					// Приховуємо форму і показуємо підтвердження
+					document.getElementById('orderForm').style.display = 'none';
+					document.getElementById('confirmation').style.display = 'block';
+					document.getElementById('orderDetails').innerHTML = orderDetails;
+
+					// Викликаємо функцію Google Apps Script для збереження даних
+					google.script.run
+						.withSuccessHandler(function (message) {
+							// Обробляємо успішну відповідь від сервера
+							document.getElementById('confirmationMessage').innerText =
+								message; // Виводимо повідомлення про успіх
+						})
+						.saveOrder({
+							name: name,
+							address: address,
+							food: food,
+							comments: comments,
+						});
+				});
+		</script>
+	</body>
+</html>
